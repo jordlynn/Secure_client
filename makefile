@@ -1,2 +1,2 @@
 all:
-	gcc -Wall tcp.c
+	gcc -Wall main.c

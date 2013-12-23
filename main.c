@@ -13,17 +13,11 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <time.h>
+//#include "tcp.c"
 
-// Defines
-#define BUFFERSIZE 256 // size of buffer for networking.
 
 // Prototypes
-void Error( const char *msg );
 unsigned long Calculate( unsigned long key );
 unsigned long IntPow( unsigned long x, unsigned long pow );
 
@@ -33,10 +27,7 @@ unsigned long MOD = 17;
 unsigned long GENERATOR = 3;
 
 int main(int argc, char *argv []){
-	int sockfd, newsockfd, portno; // network info.
-	socklen_t clilen;
 	srand(time(NULL)); // Set seed for number generator.
-	char buffer[BUFFERSIZE]; // Buffer to be sent across network.
 	unsigned long privateKey = rand() % MOD; // Key to use in key exchange.
 	unsigned long publicKey = Calculate( privateKey );
 	
@@ -68,11 +59,4 @@ unsigned long Calculate( unsigned long key ){
 	publicAnswer = ((IntPow( GENERATOR, key )) % MOD);
 	// printf("GOT %lu\n", publicAnswer); // Debugging printf
 	return publicAnswer;
-}
-
-
-// error will print whatever error message the terminal receives
-void Error( const char *msg ){
-	perror( msg );
-	exit(1);
 }
