@@ -3,17 +3,7 @@
 		- TCP connection
 		- Test that IntPow() works correctly
 		- Take over world
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <time.h>
-
-/* 
+ 
 	To practice security across networks we'll use a
 	basic key exchange, using a prime number as the
 	modulus ( 17 ) and a primitive root of 17 which
@@ -22,42 +12,52 @@
 	all the numbers 0 - 16. So basically no number is 
 	more likely to occur than any other.
 */
-#define BUFFERSIZE 256
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <time.h>
+
+// Defines
+#define BUFFERSIZE 256 // size of buffer for networking.
 
 // Prototypes
 void Error( const char *msg );
-int Calculate( int key );
-int IntPow( int x, uint pow );
+unsigned long Calculate( unsigned long key );
+unsigned long IntPow( unsigned long x, unsigned long pow );
 
 
 // Globals
-int MOD = 17;
-int GENERATOR = 3;
+unsigned long MOD = 17;
+unsigned long GENERATOR = 3;
 
 int main(int argc, char *argv []){
-	int sockfd, newsockfd, portno;
+	int sockfd, newsockfd, portno; // network info.
 	socklen_t clilen;
 	srand(time(NULL)); // Set seed for number generator.
 	char buffer[BUFFERSIZE]; // Buffer to be sent across network.
-	int privateKey = rand() % MOD; // Key to use in key exchange.
-	int publicKey = Calculate( privateKey );
-	printf("KEY1: %d\n", privateKey);
-	printf("KEY: %d\n", publicKey);
+	unsigned long privateKey = rand() % MOD; // Key to use in key exchange.
+	unsigned long publicKey = Calculate( privateKey );
 	
+	printf("KEY1: %lu\n", privateKey);
+	printf("KEY: %lu\n", publicKey);
 	
+
 return 0;
 }
 
 // IntPow just performs integer exponentiation.
-int IntPow( int x, int pow ){
-	int ret = 0;
-
-	while( pow != 0 ){
-		
-		x = x * x;
-		pow--;
+unsigned long IntPow( unsigned long x, unsigned long pow ){
+	unsigned long ret = 0;
+	unsigned long temp = x;
+	
+	while( pow > 1 ){	
+		temp = temp * x; // Multiply answer by the key value (x)
+		pow--; // decrement counter
 	}
-	ret = x;
+	ret = temp; // Assign final answer.
 	return ret;
 }
 
@@ -65,10 +65,11 @@ int IntPow( int x, int pow ){
 	after that then will perfor a modulus of "MOD" and return an interger
 	that is then shared with the other client. 
 */ 
-int Calculate( int key ){
-	int publicAnswer; // Number to be return and ultimatly sent to other client.
-
-	publicAnswer = IntPow( GENERATOR, key ) % MOD;
+unsigned long Calculate( unsigned long key ){
+	unsigned long publicAnswer; // Number to be return and ultimatly sent to other client.
+	
+	publicAnswer = ((IntPow( GENERATOR, key )) % MOD);
+	// printf("GOT %lu\n", publicAnswer); // Debugging printf
 	return publicAnswer;
 }
 
