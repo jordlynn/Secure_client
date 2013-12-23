@@ -1,7 +1,6 @@
 // tcp.c written by Jordan Lynn
 /* TODO:
 		- TCP connection
-		- Test that IntPow() works correctly
 		- Take over world
  
 	To practice security across networks we'll use a
@@ -41,9 +40,7 @@ int main(int argc, char *argv []){
 	unsigned long privateKey = rand() % MOD; // Key to use in key exchange.
 	unsigned long publicKey = Calculate( privateKey );
 	
-	printf("KEY1: %lu\n", privateKey);
-	printf("KEY: %lu\n", publicKey);
-	
+		
 
 return 0;
 }
