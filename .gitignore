@@ -1,0 +1,5 @@
+# Hide development test executables:
+*.out
+
+# Also hide VIM's *.swp files
+*.swp
