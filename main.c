@@ -39,16 +39,15 @@ return 0;
 }
 
 // IntPow just performs integer exponentiation.
-unsigned long IntPow( unsigned long x, unsigned long pow ){
+unsigned long IntPow( unsigned long x, unsigned long pow, unsigned long mod ){
 	unsigned long ret = 0;
 	unsigned long temp = x;
 	
 	while( pow > 1 ){	
-		temp = temp * x; // Multiply answer by the key value (x)
+		temp = (temp * x) % mod; // Multiply answer by the key value (x)
 		pow--; // decrement counter
 	}
-	ret = temp; // Assign final answer.
-	return ret;
+	return temp; // Assign final answer
 }
 
 /*  Calculate will take a private key, and exponetiate it to the generator
@@ -58,7 +57,7 @@ unsigned long IntPow( unsigned long x, unsigned long pow ){
 unsigned long Calculate( unsigned long key ){
 	unsigned long publicAnswer; // Number to be return and ultimatly sent to other client.
 	
-	publicAnswer = ((IntPow( GENERATOR, key )) % MOD);
+	publicAnswer = (IntPow( GENERATOR, key, MOD );
 	// printf("GOT %lu\n", publicAnswer); // Debugging printf
 	return publicAnswer;
 }
