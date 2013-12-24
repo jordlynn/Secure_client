@@ -2,6 +2,7 @@
 /* TODO:
 		- TCP connection
 		- Take over world
+		- Spawn child process to setup TCP connection
  
 	To practice security across networks we'll use a
 	basic key exchange, using a prime number as the
@@ -14,24 +15,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-//#include "tcp.c"
+#include "tcp.c"
 
 
 // Prototypes
 unsigned long Calculate( unsigned long key );
 unsigned long IntPow( unsigned long x, unsigned long pow );
-
+void SetupConnection();
 
 // Globals
 unsigned long MOD = 17;
 unsigned long GENERATOR = 3;
+int PORTNUM = 80;
 
 int main(int argc, char *argv []){
 	srand(time(NULL)); // Set seed for number generator.
 	unsigned long privateKey = rand() % MOD; // Key to use in key exchange.
 	unsigned long publicKey = Calculate( privateKey );
-	
-		
+	InitializeConnection( PORTNUM ); // Start TCP connection.
+			
 
 return 0;
 }
