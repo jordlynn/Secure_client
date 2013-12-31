@@ -11,41 +11,80 @@
 	these functions and calls are working google the header file.
 */
 void InitializeServer( char *portno ){
-	socklen_t clilen;
-	int sockfd, newsockfd;
-	char buffer[BUFFSIZE];
-	int n;
-	// TODO: Do error handling to check portno ect..
 	
-	printf("Starting socket...\n");
-	sockfd = socket(AF_INET, SOCK_STREAM, 0); // Assign socket
-	if ( sockfd < 0){ // socket() will return < 0 if an error occured.
-		printf("ERROR: couldn't bind socket!\n");
-		return;
-	}
-	bzero((char *) &serv_addr, sizeof(serv_addr));	
-	serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-    //serv_addr.sin_port = htons(portno);	
+	struct addrinfo hints;
+    struct addrinfo *result, *rp;
+    int sfd, s;
+    struct sockaddr_storage peer_addr;
+    socklen_t peer_addr_len;
+    ssize_t nread;
+    char buf[BUFFSIZE];
 
-	if ( bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0)
-		error("ERROR on binding");
-	
-	listen(sockfd,5); // Server is now up and listening!
-	clilen = sizeof(cli_addr);
-	newsockfd = accept(sockfd, 
-                 (struct sockaddr *) &cli_addr, 
-                 &clilen);
-	if (newsockfd < 0) 
-          error("ERROR on accept");
-     bzero(buffer,256);
-     n = read(newsockfd,buffer,255);
-     if (n < 0) error("ERROR reading from socket");
-     printf("Here is the message: %s\n",buffer);
-     n = write(newsockfd,"I got your message",18);
-     if (n < 0) error("ERROR writing to socket");
-     close(newsockfd);
-     close(sockfd);
+   memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
+    hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
+    hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
+    hints.ai_protocol = 0;          /* Any protocol */
+    hints.ai_canonname = NULL;
+    hints.ai_addr = NULL;
+    hints.ai_next = NULL;
+
+   s = getaddrinfo(NULL, portno, &hints, &result);
+    if (s != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+        exit(EXIT_FAILURE);
+    }
+
+   /* getaddrinfo() returns a list of address structures.
+       Try each address until we successfully bind(2).
+       If socket(2) (or bind(2)) fails, we (close the socket
+       and) try the next address. */
+
+   for (rp = result; rp != NULL; rp = rp->ai_next) {
+        sfd = socket(rp->ai_family, rp->ai_socktype,
+                rp->ai_protocol);
+        if (sfd == -1)
+            continue;
+
+       if (bind(sfd, rp->ai_addr, rp->ai_addrlen) == 0)
+            break;                  /* Success */
+
+       close(sfd);
+    }
+
+   if (rp == NULL) {               /* No address succeeded */
+        fprintf(stderr, "Could not bind\n");
+        exit(EXIT_FAILURE);
+    }
+
+   freeaddrinfo(result);           /* No longer needed */
+
+   /* Read datagrams and echo them back to sender */
+
+   for (;;) {
+        peer_addr_len = sizeof(struct sockaddr_storage);
+        nread = recvfrom(sfd, buf, BUFFSIZE, 0,
+                (struct sockaddr *) &peer_addr, &peer_addr_len);
+        if (nread == -1)
+            continue;               /* Ignore failed request */
+
+       char host[NI_MAXHOST], service[NI_MAXSERV];
+
+       s = getnameinfo((struct sockaddr *) &peer_addr,
+                        peer_addr_len, host, NI_MAXHOST,
+                        service, NI_MAXSERV, NI_NUMERICSERV);
+       if (s == 0)
+            printf("Received %ld bytes from %s:%s\n",
+                    (long) nread, host, service);
+        else
+            fprintf(stderr, "getnameinfo: %s\n", gai_strerror(s));
+
+       if (sendto(sfd, buf, nread, 0,
+                    (struct sockaddr *) &peer_addr,
+                    peer_addr_len) != nread)
+            fprintf(stderr, "Error sending response\n");
+    }
+
 }
 
 /* Creates the client side of the two way communcation and will 
@@ -66,10 +105,11 @@ void InitializeClient( char *portno ){
 	struct addrinfo hints; // Holds specs of connection addept.
 	struct addrinfo *result, *rp; // will return with point to connection!
 	int sfd, s, j;
-    size_t len;
-    ssize_t nread;
-    char buf[BUFFSIZE];
-	char *address;	
+	size_t len;
+	ssize_t nread;
+	char buf[BUFFSIZE]; // Used to recieve messages.
+	char *address; // Holds address/IPv4/IPv6 of other client.	
+	char testM [128] = "TEST FROM CLIENT"; // quick test message. for debugging.	
 
 	memset(&hints, 0, sizeof(struct addrinfo)); // Alocate memory for addrinfo
     hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
@@ -115,22 +155,21 @@ void InitializeClient( char *portno ){
        datagrams, and read responses from server 
 	*/
 
-	for (j = 3; j < argc; j++) {
-        len = strlen(argv[j]) + 1;
+	for (j = 3; j < BUFFSIZE ; j++){
+        len = strlen(testM) + 1;
                 // +1 for terminating null byte
 
-       if (len + 1 > BUF_SIZE) {
-            fprintf(stderr,
-                    "Ignoring long message in argument %d\n", j);
+       if (len + 1 > BUFFSIZE){
+            fprintf(stderr,"Uh oh! Message exceeded buffer! %d\n", j);
             continue;
         }
 
-       if (write(sfd, argv[j], len) != len) {
+       if (write(sfd, testM, len) != len) {
             fprintf(stderr, "partial/failed write\n");
             exit(EXIT_FAILURE);
         }
 
-       nread = read(sfd, buf, BUF_SIZE);
+       nread = read(sfd, buf, BUFFSIZE);
         if (nread == -1) {
             perror("read");
             exit(EXIT_FAILURE);
