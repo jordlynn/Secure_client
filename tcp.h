@@ -20,4 +20,4 @@ void InitializeClient( int portno );
 struct sockaddr_in serv_addr, cli_addr;
 
 // Globals
-int BUFFSIZE = 256
+int BUFFSIZE = 256;

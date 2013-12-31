@@ -69,25 +69,23 @@ void InitializeClient( int portno ){
     size_t len;
     ssize_t nread;
     char buf[BUFFSIZE];
-	
+	char *address;	
 
 	memset(&hints, 0, sizeof(struct addrinfo)); // Alocate memory for addrinfo
     hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM;// Use a TCP connection, switch to UDP for funsies later?
     hints.ai_flags = AI_PASSIVE;	// For wildcard IP address 
     hints.ai_protocol = 0;			// Any protocol 
-    hints.ai_canonname = NULL;		// Holds pointer to host's address.
-    hints.ai_addr = NULL;			// Holds pointer to current socket.
-    hints.ai_next = NULL;			// Holds pointer to next possible socket! (this is cool)
-
 	
+	printf("Please enter the server's addres: ");
+	scanf("%s", &address);	
+	s = getaddrinfo(argv[1], portno, &hints, &result);
+    if (s != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+        exit(EXIT_FAILURE);
+    }
+		
  
-	/* Originally here I would call "gethostbyname()" but as I read about
-		it more and more it seems outdated, it will even check IPv4 addresses.
-		So in the name of being current and up-to-date we'll use it's successor
-		"getaddinfo" which is actually pretty cool.
-	*/	
-	
 }
 // Simple error function, call this for possible failures.
 void error( const char *msg ){
