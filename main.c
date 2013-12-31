@@ -26,23 +26,20 @@ void SetupConnection();
 // Globals
 unsigned long MOD = 17;
 unsigned long GENERATOR = 3;
-int PORTNUM = 80;
+char *PORTNUM = "8080";
 
 int main(int argc, char *argv []){
 	srand(time(NULL)); // Set seed for number generator.
 	unsigned long privateKey = rand() % MOD; // Key to use in key exchange.
 	unsigned long publicKey = Calculate( privateKey );
 	int temp = 0;
-
+	
 	// First we'll ask the user how this will get setup.
-	// We'll use a 'while' loop to return if the answer isn't right.
-	while( temp != 1 || temp != 2 ){
-		printf("Hello! Would you like to be a server(1) or client(2)?");
-		scanf("%d", &temp);
-		if( temp == 1 ) InitializeServer( PORTNUM ); // Start TCP connection.
-		else if( temp == 2 );
-		else printf("Sorry I didn't understand your choice!\n");
-	}	
+	printf("Hello! Would you like to be a server(1) or client(2)? ");
+	scanf("%d", &temp);
+	if( temp == 1 ) InitializeServer( PORTNUM ); // Start TCP connection.
+	else if( temp == 2 ) InitializeClient( PORTNUM );
+	else printf("Sorry I didn't understand your choice!\n");
 
 return 0;
 }
