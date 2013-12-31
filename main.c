@@ -20,7 +20,7 @@
 
 // Prototypes
 unsigned long Calculate( unsigned long key );
-unsigned long IntPow( unsigned long x, unsigned long pow );
+unsigned long IntPow( unsigned long x, unsigned long pow, unsigned long mod );
 void SetupConnection();
 
 // Globals
@@ -32,15 +32,23 @@ int main(int argc, char *argv []){
 	srand(time(NULL)); // Set seed for number generator.
 	unsigned long privateKey = rand() % MOD; // Key to use in key exchange.
 	unsigned long publicKey = Calculate( privateKey );
-	InitializeConnection( PORTNUM ); // Start TCP connection.
-			
+	int temp = 0;
+
+	// First we'll ask the user how this will get setup.
+	// We'll use a 'while' loop to return if the answer isn't right.
+	while( temp != 1 || temp != 2 ){
+		printf("Hello! Would you like to be a server(1) or client(2)?");
+		scanf("%d", &temp);
+		if( temp == 1 ) InitializeServer( PORTNUM ); // Start TCP connection.
+		else if( temp == 2 );
+		else printf("Sorry I didn't understand your choice!\n");
+	}	
 
 return 0;
 }
 
 // IntPow just performs integer exponentiation.
 unsigned long IntPow( unsigned long x, unsigned long pow, unsigned long mod ){
-	unsigned long ret = 0;
 	unsigned long temp = x;
 	
 	while( pow > 1 ){	
@@ -57,7 +65,7 @@ unsigned long IntPow( unsigned long x, unsigned long pow, unsigned long mod ){
 unsigned long Calculate( unsigned long key ){
 	unsigned long publicAnswer; // Number to be return and ultimatly sent to other client.
 	
-	publicAnswer = (IntPow( GENERATOR, key, MOD );
+	publicAnswer = (IntPow( GENERATOR, key, MOD));
 	// printf("GOT %lu\n", publicAnswer); // Debugging printf
 	return publicAnswer;
 }

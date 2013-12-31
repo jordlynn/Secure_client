@@ -10,10 +10,10 @@
 	A lot of this function uses sys/socket.h so if you want more info on how
 	these functions and calls are working google the header file.
 */
-void InitializeConnection( int portno ){
+void InitializeServer( int portno ){
 	socklen_t clilen;
 	int sockfd, newsockfd;
-	char buffer[BUFFERSIZE];
+	char buffer[BUFFSIZE];
 	int n;
 	// TODO: Do error handling to check portno ect..
 	
@@ -48,6 +48,43 @@ void InitializeConnection( int portno ){
      close(sockfd);
 }
 
+/* Creates the client side of the two way communcation and will 
+	intiate the communication. It will first make sure everyone
+	has agreed on the same public key, then will exchange it's 
+	public key(s) and start the encypted communcation.
+*/
+void InitializeClient( int portno ){
+	   
+	// Because of the switch to "getaddrinfo()" we need a struct to hold info on connection.
+	struct addrinfo hints; // Holds specs of connection addept.
+	struct addrinfo *result, *rp; // will return with point to connection!
+	int sfd, s, j;
+    size_t len;
+    ssize_t nread;
+    char buf[BUFFSIZE];
+	
+
+	memset(&hints, 0, sizeof(struct addrinfo)); // Alocate memory for addrinfo
+    hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
+    hints.ai_socktype = SOCK_STREAM;// Use a TCP connection, switch to UDP for funsies later?
+    hints.ai_flags = AI_PASSIVE;	// For wildcard IP address 
+    hints.ai_protocol = 0;			// Any protocol 
+    hints.ai_canonname = NULL;		// Holds pointer to host's address.
+    hints.ai_addr = NULL;			// Holds pointer to current socket.
+    hints.ai_next = NULL;			// Holds pointer to next possible socket! (this is cool)
+
+	
+ 
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd < 0) error("ERROR opening socket"); // check socket() worked.
+	
+	/* Originally here I would call "gethostbyname()" but as I read about
+		it more and more it seems outdated, it will even check IPv4 addresses.
+		So in the name of being current and up-to-date we'll use it's successor
+		"getaddinfo" which is actually pretty cool.
+	*/	
+	
+}
 // Simple error function, call this for possible failures.
 void error( const char *msg ){
 	perror(msg);
