@@ -52,7 +52,14 @@ void InitializeServer( int portno ){
 	intiate the communication. It will first make sure everyone
 	has agreed on the same public key, then will exchange it's 
 	public key(s) and start the encypted communcation.
-*/
+			
+BIG CHANGE BELOW!
+	Originally the function would call "gethostbyname()" but as I read about
+		it more and more it seems outdated, it will even check IPv4 addresses.
+		So in the name of being current and up-to-date we'll use it's successor
+		"getaddinfo" which is actually pretty cool.
+*/	
+
 void InitializeClient( int portno ){
 	   
 	// Because of the switch to "getaddrinfo()" we need a struct to hold info on connection.
@@ -75,9 +82,6 @@ void InitializeClient( int portno ){
 
 	
  
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0) error("ERROR opening socket"); // check socket() worked.
-	
 	/* Originally here I would call "gethostbyname()" but as I read about
 		it more and more it seems outdated, it will even check IPv4 addresses.
 		So in the name of being current and up-to-date we'll use it's successor
