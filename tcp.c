@@ -108,8 +108,8 @@ void InitializeClient( char *portno ){
 	size_t len;
 	ssize_t nread;
 	char buf[BUFFSIZE]; // Used to recieve messages.
-	char *address; // Holds address/IPv4/IPv6 of other client.	
-	char testM [128] = "TEST FROM CLIENT"; // quick test message. for debugging.	
+	char testM [128];
+	char *address = testM; // Holds address/IPv4/IPv6 of other client.	
 
 	memset(&hints, 0, sizeof(struct addrinfo)); // Alocate memory for addrinfo
     hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
@@ -118,8 +118,8 @@ void InitializeClient( char *portno ){
     hints.ai_protocol = 0;			// Any protocol 
 	
 	printf("Please enter the server's addres: ");
-	scanf("%p", &address);	
-
+	scanf("%s", address);	
+	printf("Recieved: %s\n", address);	
 	s = getaddrinfo(address, portno, &hints, &result); // Here's the magic!
     if (s != 0) { // If the address failed
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
