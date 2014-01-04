@@ -1,5 +1,6 @@
 /* File for intiating TCP connection with other client */
 #include "tcp.h"
+#include "main.h"
 
 /* Creates the server side of the client for the two way communcation and waits for
 	a connection. Either one of the people in the chat needs to send the key to
@@ -9,6 +10,8 @@
 	
 	A lot of this function uses sys/socket.h so if you want more info on how
 	these functions and calls are working google the header file.
+
+	If you're looking for a way to debug go to the main.h file and set the "DEBUG" value to 1. 
 */
 void InitializeServer( char *portno ){
 	
@@ -22,13 +25,13 @@ void InitializeServer( char *portno ){
 
    memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
-    hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
+    hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
     hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
     hints.ai_protocol = 0;          /* Any protocol */
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
-
+	printf("starting server...\n");
    s = getaddrinfo(NULL, portno, &hints, &result);
     if (s != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
@@ -110,6 +113,8 @@ void InitializeClient( char *portno ){
 	char buf[BUFFSIZE]; // Used to recieve messages.
 	char testM [128];
 	char *address = testM; // Holds address/IPv4/IPv6 of other client.	
+	int childPID; // Used when forking.
+	int *retStatus = NULL;
 
 	memset(&hints, 0, sizeof(struct addrinfo)); // Alocate memory for addrinfo
     hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
@@ -117,37 +122,52 @@ void InitializeClient( char *portno ){
     hints.ai_flags = AI_PASSIVE;	// For wildcard IP address 
     hints.ai_protocol = 0;			// Any protocol 
 	
-	printf("Please enter the server's addres: ");
-	scanf("%s", address);	
-	printf("Recieved: %s\n", address);	
-	s = getaddrinfo(address, portno, &hints, &result); // Here's the magic!
-    if (s != 0) { // If the address failed
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
-        exit(EXIT_FAILURE);
-    }
+	printf("Please enter the server's addres: "); // prompt for address, store.
+	scanf("%s", address);
 	
-	/* getaddrinfo() returns a list of address structures. So we need to try
-		every address until we connect, if socket or connect fail we close
-		the socket and move onto the next address.
-		This is exactly like traversing any other type of LL.
-	*/		
-	for (rp = result; rp != NULL; rp = rp->ai_next) {
-        sfd = socket(rp->ai_family, rp->ai_socktype,
-                     rp->ai_protocol);
-        if (sfd == -1)
-            continue;
+	if( DEBUG ) printf("Atempting to connect to: %s\n", address);	
 
-       if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1)
-            break;                  /* Success */
+	childPID = fork(); // Fork off and step into process child.
+	
+	// Now if we are the child continue else wait (parent)
+	if( childPID ) childPID = wait(retStatus);
+	
+	/* Sorry about the curly brackets on the else statement, my screen isn't large enough
+	   and I'm having problems getting things to match up but can't see the top and bottom
+	   it works, just around the end of the connection stuff the brackets get freaky.
+	*/	
+	else{	
+		// We should now be in the child...
+		// The following sleep is used to help with debugging with gdb.
+		if( DEBUG ) sleep(15);
+	
+		s = getaddrinfo(address, portno, &hints, &result); // Here's the magic!
+		if (s != 0) { // If the address failed
+			fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+			exit(-1);
+    		}
+		/* getaddrinfo() returns a list of address structures. So we need to try
+			every address until we connect, if socket or connect fail we close
+			the socket and move onto the next address.
+			This is exactly like traversing any other type of LL.
+		*/		
+		for (rp = result; rp != NULL; rp = rp->ai_next) {
+			sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+			if (sfd == -1)
+			continue;
 
-       close(sfd);
-    }
+			if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1)
+			break;                  /* Success */
+
+			close(sfd);
+		}
 
 	// If rp == NULL then we didn't find any addresses.
 	 if (rp == NULL) {
         fprintf(stderr, "Could not connect\n");
         exit(EXIT_FAILURE);
     } 
+	}
 	
 	freeaddrinfo(result); // No longer needed since we have our socket.
 

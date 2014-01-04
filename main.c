@@ -17,7 +17,6 @@
 #include <time.h>
 #include "tcp.c"
 
-
 // Prototypes
 unsigned long Calculate( unsigned long key );
 unsigned long IntPow( unsigned long x, unsigned long pow, unsigned long mod );
