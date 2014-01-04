@@ -25,7 +25,7 @@ void SetupConnection();
 // Globals
 unsigned long MOD = 17;
 unsigned long GENERATOR = 3;
-char *PORTNUM = "8080";
+char *PORTNUM = "8118";
 
 int main(int argc, char *argv []){
 	srand(time(NULL)); // Set seed for number generator.

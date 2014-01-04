@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <strings.h>
 #include <netdb.h>
+#include <sys/wait.h>
 
 // Defines
 #define BUFFERSIZE 256 // size of buffer for networking.

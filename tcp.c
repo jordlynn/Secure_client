@@ -113,7 +113,7 @@ void InitializeClient( char *portno ){
 	char buf[BUFFSIZE]; // Used to recieve messages.
 	char testM [128];
 	char *address = testM; // Holds address/IPv4/IPv6 of other client.	
-	int childPID; // Used when forking.
+	pid_t childPID; // Used when forking.
 	int *retStatus = NULL;
 
 	memset(&hints, 0, sizeof(struct addrinfo)); // Alocate memory for addrinfo
@@ -125,22 +125,23 @@ void InitializeClient( char *portno ){
 	printf("Please enter the server's addres: "); // prompt for address, store.
 	scanf("%s", address);
 	
-	if( DEBUG ) printf("Atempting to connect to: %s\n", address);	
+	if( DEBUG ) printf("Atempting to connect to: %s\n", address);
 
-	childPID = fork(); // Fork off and step into process child.
-	
+	// Now lets fork to start the connection.
+	childPID = fork();
+	if( childPID == -1 ){
+		printf("Error in forking!\n");
+		exit(EXIT_FAILURE);
+	}
+
 	// Now if we are the child continue else wait (parent)
-	if( childPID ) childPID = wait(retStatus);
-	
-	/* Sorry about the curly brackets on the else statement, my screen isn't large enough
-	   and I'm having problems getting things to match up but can't see the top and bottom
-	   it works, just around the end of the connection stuff the brackets get freaky.
-	*/	
-	else{	
+	if( childPID == 0 ){ // Child
+		
 		// We should now be in the child...
-		// The following sleep is used to help with debugging with gdb.
-		if( DEBUG ) sleep(15);
-	
+		
+		if( DEBUG ) printf("Child PID: %ld\n", (long) getpid());
+		if( DEBUG ) sleep(15); // Used to help with debugging with gdb.
+		
 		s = getaddrinfo(address, portno, &hints, &result); // Here's the magic!
 		if (s != 0) { // If the address failed
 			fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
@@ -162,13 +163,13 @@ void InitializeClient( char *portno ){
 			close(sfd);
 		}
 
-	// If rp == NULL then we didn't find any addresses.
-	 if (rp == NULL) {
-        fprintf(stderr, "Could not connect\n");
-        exit(EXIT_FAILURE);
-    } 
+		// If rp == NULL then we didn't find any addresses.
+		 if (rp == NULL) {
+		        fprintf(stderr, "Could not connect\n");
+			exit(EXIT_FAILURE);
+		}
 	}
-	
+	else{ // Parent
 	freeaddrinfo(result); // No longer needed since we have our socket.
 
 	/* Send remaining command-line arguments as separate
@@ -196,6 +197,7 @@ void InitializeClient( char *portno ){
         }
 		printf("Received %ld bytes: %s\n", (long) nread, buf);
     }
+	}
 }
 // Simple error function, call this for possible failures.
 void error( const char *msg ){
