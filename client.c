@@ -2,7 +2,7 @@
 
 #define BUF_SIZE 500
 
-void InitializeClient( int argc, char *argv[] ){
+void InitializeClient( int argc, char *argv[], unsigned long key ){
     struct addrinfo hints;
     struct addrinfo *result, *rp;
     int sfd, s, j;
@@ -57,7 +57,7 @@ void InitializeClient( int argc, char *argv[] ){
        datagrams, and read responses from server */
 
    for (j = 3; j < argc; j++) {
-        len = strlen(argv[j]) + 1;
+        len = strlen(key) + 1;
                 /* +1 for terminating null byte */
 
        if (len + 1 > BUF_SIZE) {
@@ -66,7 +66,7 @@ void InitializeClient( int argc, char *argv[] ){
             continue;
         }
 
-       if (write(sfd, argv[j], len) != len) {
+       if (write(sfd, key, len) != len) {
             fprintf(stderr, "partial/failed write\n");
             exit(EXIT_FAILURE);
         }
@@ -80,6 +80,5 @@ void InitializeClient( int argc, char *argv[] ){
        printf("Received %ld bytes: %s\n", (long) nread, buf);
     }
 
-   exit(EXIT_SUCCESS);
 }
 

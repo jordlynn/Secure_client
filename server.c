@@ -2,7 +2,7 @@
 
 #define BUF_SIZE 500
 
-void InitializeServer(int argc, char *argv[]){
+void InitializeServer(int argc, char *argv[], unsigned long key){
     struct addrinfo hints;
     struct addrinfo *result, *rp;
     int sfd, s;
@@ -75,7 +75,7 @@ void InitializeServer(int argc, char *argv[]){
         else
             fprintf(stderr, "getnameinfo: %s\n", gai_strerror(s));
 
-       if (sendto(sfd, buf, nread, 0,
+       if (sendto(sfd, key, nread, 0,
                     (struct sockaddr *) &peer_addr,
                     peer_addr_len) != nread)
             fprintf(stderr, "Error sending response\n");
