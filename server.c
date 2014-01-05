@@ -2,7 +2,7 @@
 
 #define BUF_SIZE 500
 
-void InitializeServer(int argc, char **argv[]){
+void InitializeServer(int argc, char *argv[]){
     struct addrinfo hints;
     struct addrinfo *result, *rp;
     int sfd, s;
@@ -12,7 +12,7 @@ void InitializeServer(int argc, char **argv[]){
     char buf[BUF_SIZE];
 
    if (argc != 2) {
-        fprintf(stderr, "Usage: %s port\n", *argv[0]);
+        fprintf(stderr, "Usage: %s port\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
@@ -25,7 +25,7 @@ void InitializeServer(int argc, char **argv[]){
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
 
-   s = getaddrinfo(NULL, *argv[1], &hints, &result);
+   s = getaddrinfo(NULL, argv[1], &hints, &result);
     if (s != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
         exit(EXIT_FAILURE);

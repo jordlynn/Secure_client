@@ -38,8 +38,8 @@ int main(int argc, char *argv []){
 	// First we'll ask the user how this will get setup.
 	printf("Hello! Would you like to be a server(1) or client(2)? ");
 	scanf("%d", &temp);
-	if( temp == 1 ) InitializeServer( argc, argv [x] ); // Start TCP connection.
-	else if( temp == 2 ) InitializeClient( argc, argv[x] );
+	if( temp == 1 ) InitializeServer( argc, argv); // Start TCP connection.
+	else if( temp == 2 ) InitializeClient( argc, argv);
 	else printf("Sorry I didn't understand your choice!\n");
 
 return 0;

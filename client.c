@@ -2,7 +2,7 @@
 
 #define BUF_SIZE 500
 
-void InitializeClient( int argc, char **argv[] ){
+void InitializeClient( int argc, char *argv[] ){
     struct addrinfo hints;
     struct addrinfo *result, *rp;
     int sfd, s, j;
@@ -11,7 +11,7 @@ void InitializeClient( int argc, char **argv[] ){
     char buf[BUF_SIZE];
 
    if (argc < 3) {
-        fprintf(stderr, "Usage: %s host port msg...\n", *argv[0]);
+        fprintf(stderr, "Usage: %s host port msg...\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
@@ -23,7 +23,7 @@ void InitializeClient( int argc, char **argv[] ){
     hints.ai_flags = 0;
     hints.ai_protocol = 0;          /* Any protocol */
 
-   s = getaddrinfo(*argv[1], *argv[2], &hints, &result);
+   s = getaddrinfo(argv[1], argv[2], &hints, &result);
     if (s != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
         exit(EXIT_FAILURE);
@@ -57,7 +57,7 @@ void InitializeClient( int argc, char **argv[] ){
        datagrams, and read responses from server */
 
    for (j = 3; j < argc; j++) {
-        len = strlen(*argv[j]) + 1;
+        len = strlen(argv[j]) + 1;
                 /* +1 for terminating null byte */
 
        if (len + 1 > BUF_SIZE) {

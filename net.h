@@ -13,8 +13,8 @@
 
 // Prototypes
 void error( const char *msg );
-void InitializeServer(  int argc, char **argv[] );
-void InitializeClient(  int argc, char **argv[] );
+void InitializeServer(  int argc, char *argv []);
+void InitializeClient(  int argc, char *argv []);
 
 // Structs
 struct sockaddr_in serv_addr, cli_addr;
