@@ -15,7 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "tcp.c"
+#include "client.c"
+#include "server.c"
 
 // Prototypes
 unsigned long Calculate( unsigned long key );
@@ -32,12 +33,13 @@ int main(int argc, char *argv []){
 	unsigned long privateKey = rand() % MOD; // Key to use in key exchange.
 	unsigned long publicKey = Calculate( privateKey );
 	int temp = 0;
-	
+	int x = argc;
+
 	// First we'll ask the user how this will get setup.
 	printf("Hello! Would you like to be a server(1) or client(2)? ");
 	scanf("%d", &temp);
-	if( temp == 1 ) InitializeServer( PORTNUM ); // Start TCP connection.
-	else if( temp == 2 ) InitializeClient( PORTNUM );
+	if( temp == 1 ) InitializeServer( argc, argv [x] ); // Start TCP connection.
+	else if( temp == 2 ) InitializeClient( argc, argv[x] );
 	else printf("Sorry I didn't understand your choice!\n");
 
 return 0;

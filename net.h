@@ -9,16 +9,13 @@
 #include <sys/wait.h>
 
 // Defines
-#define BUFFERSIZE 256 // size of buffer for networking.
 
 
 // Prototypes
 void error( const char *msg );
-void InitializeServer( char *portno );
-void InitializeClient( char *portno );
+void InitializeServer(  int argc, char **argv[] );
+void InitializeClient(  int argc, char **argv[] );
 
 // Structs
 struct sockaddr_in serv_addr, cli_addr;
 
-// Globals
-int BUFFSIZE = 256;
