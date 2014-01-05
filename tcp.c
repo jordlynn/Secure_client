@@ -127,21 +127,7 @@ void InitializeClient( char *portno ){
 	
 	if( DEBUG ) printf("Atempting to connect to: %s\n", address);
 
-	// Now lets fork to start the connection.
-	childPID = fork();
-	if( childPID == -1 ){
-		printf("Error in forking!\n");
-		exit(EXIT_FAILURE);
-	}
 
-	// Now if we are the child continue else wait (parent)
-	if( childPID == 0 ){ // Child
-		
-		// We should now be in the child...
-		
-		if( DEBUG ) printf("Child PID: %ld\n", (long) getpid());
-		if( DEBUG ) sleep(15); // Used to help with debugging with gdb.
-		
 		s = getaddrinfo(address, portno, &hints, &result); // Here's the magic!
 		if (s != 0) { // If the address failed
 			fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
@@ -169,7 +155,6 @@ void InitializeClient( char *portno ){
 			exit(EXIT_FAILURE);
 		}
 	}
-	else{ // Parent
 	freeaddrinfo(result); // No longer needed since we have our socket.
 
 	/* Send remaining command-line arguments as separate
@@ -196,7 +181,6 @@ void InitializeClient( char *portno ){
             exit(EXIT_FAILURE);
         }
 		printf("Received %ld bytes: %s\n", (long) nread, buf);
-    }
 	}
 }
 // Simple error function, call this for possible failures.
