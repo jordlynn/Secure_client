@@ -154,7 +154,6 @@ void InitializeClient( char *portno ){
 		        fprintf(stderr, "Could not connect\n");
 			exit(EXIT_FAILURE);
 		}
-	}
 	freeaddrinfo(result); // No longer needed since we have our socket.
 
 	/* Send remaining command-line arguments as separate
@@ -183,6 +182,8 @@ void InitializeClient( char *portno ){
 		printf("Received %ld bytes: %s\n", (long) nread, buf);
 	}
 }
+
+
 // Simple error function, call this for possible failures.
 void error( const char *msg ){
 	perror(msg);
