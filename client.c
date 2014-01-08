@@ -18,8 +18,8 @@ void InitializeClient( int argc, char *argv[], unsigned long key){
     size_t len;
     ssize_t nread;
     char buf[BUF_SIZE];
-
-   if (argc < 3) {
+   
+	if (argc < 3) {
         fprintf(stderr, "Usage: %s host port msg...\n", argv[0]);
         exit(EXIT_FAILURE);
     }
@@ -64,14 +64,24 @@ void InitializeClient( int argc, char *argv[], unsigned long key){
 
    /* Send remaining command-line arguments as separate
        datagrams, and read responses from server */
-	// sending key, 
-	len = sizeof( key ); // Find the size of the buffer needed.
-	char temp[BUF_SIZE]; // Wille be used to hold key across buffer
-	sprintf( temp, "%lu", key );  // Convert unsigned long into buffer
+	// sending MOD, GENERATOR and key. 
+	len = sizeof( MOD );	
+	char temp[BUF_SIZE];
+	sprintf( temp, "%lu", MOD );
+	if( write(sfd, temp, len ) != len ) printf("Error sending MOD!\n"); // Send MOD
+
+	len = sizeof( GENERATOR ); // Find the size of the buffer needed for the generator.
+	sprintf( temp, "%lu", GENERATOR );  // Convert unsigned long into buffer
 	if( write(sfd, temp, len ) != len ){ // Send away key.
 		printf("Error sending key!\n");
 	}
-	
+
+	len = sizeof( key ); // finally send key
+	sprintf( temp, "%lu", key );
+	if( write(sfd, temp, len ) != len ){ // Send away key.
+		printf("Error sending key!\n");
+	}
+
 	// Send other message(s) that are in command line.
 	for (j = 3; j < argc; j++) {
 		len = strlen(argv[j]) + 1; // +1 for terminating null byte 
@@ -100,7 +110,7 @@ void InitializeClient( int argc, char *argv[], unsigned long key){
 			printf("Received %ld bytes: %s\n", (long) nread, buf);
 		}
     		// Now convert the key from the buffer into an unsgined long	
-		unsigned long peerKey = strtoul( buf, NULL, 0); 	
+		key = strtoul( buf, NULL, 0); 	
 		//if( KeyVerify( peerKey, key ) ) printf("Keys didn't match! D:\n");// Compare the two keys.	
 	}
 

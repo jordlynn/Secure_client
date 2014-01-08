@@ -19,8 +19,8 @@ void InitializeServer(int argc, char *argv[], unsigned long key){
     socklen_t peer_addr_len;
     ssize_t nread;
     char buf[BUF_SIZE];
-	unsigned long peerKey;
-   if (argc != 2) {
+
+	if (argc != 2) {
         fprintf(stderr, "Usage: %s port\n", argv[0]);
         exit(EXIT_FAILURE);
     }
@@ -63,17 +63,29 @@ void InitializeServer(int argc, char *argv[], unsigned long key){
     }
 
    freeaddrinfo(result);           /* No longer needed */
-
-   /* Read datagrams and echo them back to sender */
-
+	int count = 0; // Used to decided what we're recieving, first three packets shoud be info.
    for (;;) {
-        peer_addr_len = sizeof(struct sockaddr_storage);
+        
+	peer_addr_len = sizeof(struct sockaddr_storage);
         nread = recvfrom(sfd, buf, BUF_SIZE, 0,
                 (struct sockaddr *) &peer_addr, &peer_addr_len);
-	peerKey = strtoul( buf, NULL, 0); // Now convert the buffer into unsigned long for key.	
 	
-	if( DEBUG ){
-		printf("Got key from peer: %ld\n", peerKey);
+	unsigned long peerInfo = strtoul( buf, NULL, 0); // Now convert the buffer into unsigned long for key.
+	switch (count){
+		case 0:
+			MOD = peerInfo;
+			count++;
+			break;
+		case 1:
+			GENERATOR = peerInfo;
+			count++;
+			break;
+		case 2:
+			key = peerInfo;
+			count++;
+			break;
+		default:
+			break;
 	}
 	
 	if (nread == -1)
@@ -94,8 +106,10 @@ void InitializeServer(int argc, char *argv[], unsigned long key){
                     (struct sockaddr *) &peer_addr,
                     peer_addr_len) != nread)
             fprintf(stderr, "Error sending response\n");
-    	}
-	//if ( KeyVerify( peerKey, key ) ) printf( "Key verified!\n");
-	//else printf("Something is wrong with the key! D:\n");
+	if( DEBUG ){
+		printf("Got\n MOD: %ld\n GENERATOR: %ld\n Key: %ld\n", MOD, GENERATOR, key);
+		
+	}
+	}
 }
 

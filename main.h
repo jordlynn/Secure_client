@@ -3,6 +3,7 @@
 // Globals
 unsigned long MOD = 17;
 unsigned long GENERATOR = 3;
+unsigned long peerKey;
 
 unsigned long Calculate( unsigned long key );
 unsigned long IntPow( unsigned long x, unsigned long pow, unsigned long mod );
