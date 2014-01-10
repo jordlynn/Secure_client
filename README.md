@@ -10,7 +10,6 @@ The way this program works is everyone needs to start the program and it will be
 - User 2 start program and select "Client"
 - Allow for needed data/keys to exchange
 - Begin secure chat!
-- 
 
 Current Status
 ==============
