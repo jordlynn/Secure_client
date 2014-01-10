@@ -31,8 +31,8 @@ int main(int argc, char *argv []){
 	unsigned long publicKey = Calculate( privateKey );
 	int temp = 0;
 
+	
 
-	printf("Key is: %lu\n", publicKey);
 	// First we'll ask the user how this will get setup.
 	printf("Hello! Would you like to be a server(1) or client(2)? ");
 	scanf("%d", &temp);
@@ -40,8 +40,10 @@ int main(int argc, char *argv []){
 	if( temp == 1 ) InitializeServer( argc, argv, publicKey ); // Start TCP connection.
 	else if( temp == 2 ) InitializeClient( argc, argv, publicKey );
 	else printf("Sorry I didn't understand your choice!\n");
+	
+	if( DEBUG ) PrintInfo(privateKey);
 
-	PrintInfo();
+	if( KeyVerify( peerKey, privateKey ) ) printf("Key's didn't match up! D:\n");		
 
 return 0;
 }

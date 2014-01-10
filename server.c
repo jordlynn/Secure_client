@@ -64,7 +64,7 @@ void InitializeServer(int argc, char *argv[], unsigned long key){
 
    freeaddrinfo(result);           /* No longer needed */
 	int count = 0; // Used to decided what we're recieving, first three packets shoud be info.
-   for (;;) {
+   while (peerKey == 99) {
         
 	peer_addr_len = sizeof(struct sockaddr_storage);
         nread = recvfrom(sfd, buf, BUF_SIZE, 0,
@@ -81,7 +81,7 @@ void InitializeServer(int argc, char *argv[], unsigned long key){
 			count++;
 			break;
 		case 2:
-			key = peerInfo;
+			peerKey = peerInfo;
 			count++;
 			break;
 		default:
@@ -96,20 +96,21 @@ void InitializeServer(int argc, char *argv[], unsigned long key){
        s = getnameinfo((struct sockaddr *) &peer_addr, // obtain info from peer.
                         peer_addr_len, host, NI_MAXHOST,
                         service, NI_MAXSERV, NI_NUMERICSERV);
-       if (s == 0 && DEBUG) // Show peer's info if needed.
+       if (s == 0 || DEBUG) // Show peer's info if needed.
             printf("Received %ld bytes from %s:%s\n",
                     (long) nread, host, service);
         else
             fprintf(stderr, "getnameinfo: %s\n", gai_strerror(s));
-
+	
+	// Store the server's key into the buffer and send it back.
+	sprintf( buf, "%lu", key );
        if (sendto(sfd, buf, nread, 0,
                     (struct sockaddr *) &peer_addr,
                     peer_addr_len) != nread)
             fprintf(stderr, "Error sending response\n");
-	if( DEBUG ){
-		printf("Got\n MOD: %ld\n GENERATOR: %ld\n Key: %ld\n", MOD, GENERATOR, key);
-		
+	
 	}
-	}
+
+	if( DEBUG ) printf("Got\n MOD: %ld\n GENERATOR: %ld\n Key: %ld\n", MOD, GENERATOR, peerKey);
 }
 

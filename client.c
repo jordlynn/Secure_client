@@ -62,8 +62,6 @@ void InitializeClient( int argc, char *argv[], unsigned long key){
 
    freeaddrinfo(result);           /* No longer needed */
 
-   /* Send remaining command-line arguments as separate
-       datagrams, and read responses from server */
 	// sending MOD, GENERATOR and key. 
 	len = sizeof( MOD );	
 	char temp[BUF_SIZE];
@@ -72,8 +70,8 @@ void InitializeClient( int argc, char *argv[], unsigned long key){
 
 	len = sizeof( GENERATOR ); // Find the size of the buffer needed for the generator.
 	sprintf( temp, "%lu", GENERATOR );  // Convert unsigned long into buffer
-	if( write(sfd, temp, len ) != len ){ // Send away key.
-		printf("Error sending key!\n");
+	if( write(sfd, temp, len ) != len ){ // Send away generator.
+		printf("Error sending generator!\n");
 	}
 
 	len = sizeof( key ); // finally send key
@@ -101,6 +99,7 @@ void InitializeClient( int argc, char *argv[], unsigned long key){
 		}
 
 		nread = read(sfd, buf, BUF_SIZE);
+		
 		if (nread == -1) {
 			perror("read");
 			exit(EXIT_FAILURE);
@@ -110,9 +109,8 @@ void InitializeClient( int argc, char *argv[], unsigned long key){
 			printf("Received %ld bytes: %s\n", (long) nread, buf);
 		}
     		// Now convert the key from the buffer into an unsgined long	
-		key = strtoul( buf, NULL, 0); 	
-		//if( KeyVerify( peerKey, key ) ) printf("Keys didn't match! D:\n");// Compare the two keys.	
+		peerKey = strtoul( buf, NULL, 0); 		
 	}
-
+	
 }
 
