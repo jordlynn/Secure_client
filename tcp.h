@@ -18,6 +18,8 @@ int KeyVerify( unsigned long peerKey, unsigned long key );
 void PrintInfo(unsigned long privateKey);
 unsigned long Pow( unsigned long x, unsigned long pow, unsigned long mod );
 // Both server and client need these functions so I'll put them here.
+
+
 void error( const char *msg ){
 	perror(msg);
 	exit(1);

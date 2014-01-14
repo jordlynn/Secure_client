@@ -44,8 +44,17 @@ int main(int argc, char *argv []){
 	if( DEBUG ) PrintInfo(privateKey);
 
 	if( KeyVerify( peerKey, privateKey ) ) printf("Key's didn't match up! D:\n");		
-
+	
 return 0;
+}
+// VERY simple encryption function, for funsies.
+char *Encrypt( char *arry, unsigned long key ){
+	int  i = 0;
+	int temp = 0;
+
+	temp = strlen(arry);
+	for( i = 0; i < temp; i++ ) arry[i] = ++arry[i];
+	return arry;	
 }
 
 // IntPow just performs integer exponentiation.
